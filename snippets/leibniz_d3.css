@@ -1,0 +1,3 @@
+path { fill: none; }
+path.spiral { stroke: steelblue; }
+.axis path, .axis line { stroke: #000; shape-rendering: crispEdges; }
