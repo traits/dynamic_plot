@@ -92,4 +92,4 @@ Ensure that your js files are loaded *after* your body tags (as outlined above) 
 TODO
 ----
 
-Refer to link:./snippets/readme.md[snippets] for more information.
+Refer to [snippets/readme.md](snippets/readme.md) for more information.
