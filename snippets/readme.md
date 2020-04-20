@@ -1,18 +1,18 @@
 ## Placeholders
 
-Example D3 script containing a helper function for saving rendered content as browser download (JavaScript doesn't allow local file system access). This can be used as placeholder.
+Example D3 script containing a helper function for saving rendered content as browser download (JavaScript doesn't allow local file system access). This can be used as placeholder for strict script-less requirements.
 
 #### TODO
 
-- embedding style automatically in created svg (see `test_01.svg`)
+- embedding style automatically in created svg (see `leibniz_d3.svg`)
 - creating scripting switch in output:
     ```
     <noscript>
-    <img src="http://localhost:8000/images/test_01.svg"/>
+    <img src="http://www.example.com/images/leibniz_d3.svg"/>
     </noscript> 
     [...]
     </body>
-    <script src="http://localhost:8000/js/leibniz_d3.js"></script>
+    <script src="http://www.example.com/js/leibniz_d3.js"></script>
     </html>
     ```
     or even finer granulation: 
@@ -29,6 +29,8 @@ Example D3 script containing a helper function for saving rendered content as br
             Styles: leibniz_d3.css   #             -"-
             Output_strategy:         #  both/placeholder_only/dynamic_only?    
 
+            [...]
+            
             <div class="leibniz-spiral" class="placeholder_only" style=[...]></div>
             ```   
 
