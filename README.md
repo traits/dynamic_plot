@@ -87,3 +87,9 @@ el.appendChild(renderer.domElement);
 
 
 Ensure that your js files are loaded *after* your body tags (as outlined above) so that it selects an existing element on the page. 
+
+
+TODO
+----
+
+Refer to link:./snippets/readme.md[snippets] for more information.
