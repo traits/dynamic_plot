@@ -61,7 +61,7 @@ def add_tags(gen, metadata):
         add the scripts and/or styles to the article
     """
     if 'scripts' in metadata.keys():
-        script = '<script src="{0}/js/{1}"></script>'
+        script = '<script type="module" src="{0}/js/{1}"></script>'
         metadata['scripts'] = format_resource(gen, metadata['scripts'], script)
 
     if 'styles' in metadata.keys():
@@ -70,8 +70,6 @@ def add_tags(gen, metadata):
 
     if 'dynamic_plot' in metadata.keys():
         if metadata['dynamic_plot'] == 'true':
-            s = '<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>'
-            metadata['scripts'].insert(0, s)
             three_script = '<script src="https://threejs.org/build/three.min.js"></script>'
             metadata['scripts'].insert(0, three_script)
             d3_script = '<script src="https://d3js.org/d3.v4.min.js"></script>'
