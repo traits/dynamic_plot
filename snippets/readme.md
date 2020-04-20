@@ -4,7 +4,7 @@ Example D3 script containing a helper function for saving rendered content as br
 
 #### TODO
 
-- embedding style automatically in created svg (see `leibniz_d3.svg`)
+- embedding style automatically into created svg (see `leibniz_d3.svg`)
 - creating scripting switch in output:
     ```
     <noscript>
@@ -36,4 +36,4 @@ Example D3 script containing a helper function for saving rendered content as br
 
 - extend functionality to three.js ([utilizing THREE.SVGRenderer?](https://threejs.org/docs/#examples/en/renderers/SVGRenderer))
 - more configuration and automation regarding the Pelican workflow
-- configure maintenance local d3/three css
+- configure maintenance of local d3/three css
