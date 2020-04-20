@@ -4,8 +4,8 @@ Example D3 script containing a helper function for saving rendered content as br
 
 #### TODO
 
-- embedding style automatically into created svg (see `leibniz_d3.svg`)
-- creating scripting switch in output:
+- embedding style automatically into created svg (see [`leibniz_d3.svg`](./leibniz_d3.svg) for a result, manually created from D3 svg output and [`leibniz_d3.css`](./leibniz_d3.css))
+- creating scripting switch in Pelican output:
     ```
     <noscript>
     <img src="http://www.example.com/images/leibniz_d3.svg"/>
@@ -20,7 +20,7 @@ Example D3 script containing a helper function for saving rendered content as br
     - script-only, noscript-only variants
       - configured as Pelican tag in markdown file
       - configured as container attribute for individual embeddings; `example.md` :
-          
+      -    
             ```
             Title: Dynamic Example
             Summary: ...
