@@ -1,11 +1,11 @@
 dynamic_plot
 ============
 
-Pelican plugin for embedding custom CSS and JS related to [D3](https://d3js.org/)(v4) and [three.js](https://threejs.org/) into individual Pelican blog articles. This is a rewrite/extension of Rob Story's plugin [here](https://github.com/wrobstory/pelican_dynamic).
+Pelican plugin for embedding custom CSS and JS related to [D3](https://d3js.org/) and [three.js](https://threejs.org/) into individual Pelican blog articles. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic).
 
 How
 ---
-To install the plugin, [follow the instructions on the Pelican plugin page.](https://github.com/getpelican/pelican-plugins): 
+To install the plugin, follow the instructions on the [Pelican plugin page.](https://github.com/getpelican/pelican-plugins): 
 
 
 `pelicanconf.py`:
@@ -76,20 +76,23 @@ Using D3 or/and three.js in a Blog Post
 With Markdown, this is pretty easy. Just add the raw HTML for your chart element in the middle of your markdown text: 
 
 ```
-This is going to be a blog post about D3. Here is my chart: 
+D3 plot in blog post: 
 
-<div class="dyn-plot"></div>
+<div class="leibniz-spiral" style="width:960px; height:400px;"></div>
 
+... and three graphics:
+
+<div class="three-sphere" style="width:600px; height:400px;"></div>
 ```
 
 Then with D3, make sure you're selecting that element: 
 
 ```javascript
-var svg = d3.select(".dyn-plot").append("svg")
+var svg = d3.select(".leibniz-spiral").append("svg")
 ```
 or in three:
 ```javascript
-var el = document.querySelector('.dyn-plot');
+var el = document.querySelector('.three-sphere');
 el.appendChild(renderer.domElement);
 ```
 
