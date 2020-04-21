@@ -13,36 +13,43 @@ To install the plugin, [follow the instructions on the Pelican plugin page.](htt
 PLUGINS = ['dynamic_plot']
 ```
 
-Next, create ```js``` and ```css``` directories in your ```content``` directory: 
+Next, create `js` and `css` directories in your `content` directory: 
 ```
-website/
-├── content
-│   ├── js/
-│   │   └── d3_example.js
-│   │   └── three_example.js
-│   ├── css/
-│   │   └── d3_styles.css
-│   ├── articles/
-│   │   └── article.md
-│   └── pages
-│       └── about.md
-└── pelicanconf.py
-```
-
-and then add each resource as a comma-separated file name in the ```Scripts``` and ```Styles``` tags: 
-```
-Title: Using D3.js and three.js
-Date: 2020-04-16
-Category: blog
-Summary: D3 and three.js usage...
-Dynamic_plot: true
-Scripts: leibniz_d3.js, sphere_three.js
-Styles: leibniz_d3.css
+  site/
+    ├── content
+    │   ├── js/
+    │   │   └── d3_example.js
+    │   │   └── three_example.js
+    │   ├── css/
+    │   │   └── d3_styles.css
+    │   ├── articles/
+    │   │   └── article.md
+    │   └── pages
+    │       └── about.md
+    └── pelicanconf.py
 ```
 
-For ```dynamic_plot:true``` D3 and three processing for this article will be turned on. All of the JS and CSS will be copied in corresponding ```js``` and ```css``` folders in your ```output``` folder. 
+and then add each resource as a comma-separated file name in the `Scripts` and `Styles` tags: 
+```
+title: Using D3.js and three.js
+date: 2020-04-16
+category: blog
+summary: D3 and three.js usage...
+dynamic_plot: true
+d3_file: d3.v5.min.js
+scripts: leibniz_d3.js, sphere_three.js
+styles: leibniz_d3.css
+```
 
-Finally, in your base template (likely named ```base.html```), you need to add the following in your ```head``` tags. The same can be done for pages: 
+- `dynamic_plot` (default `None`): 
+  
+  If `true`, D3 and three processing for this article will be turned on. All of the JS and CSS will be copied in corresponding `js` and `css` folders in your `output` folder. 
+
+- `d3_file` (default: `'d3.v4.min.js'`): 
+  
+  Changes the D3 variant at article level into `f'https://d3js.org/{d3_file}'`. 
+
+Finally, in your base template (likely named `base.html`), you need to add the following in your `head` tags: 
 ```
 {% if article %}
     {% if article.styles %}
@@ -52,7 +59,7 @@ Finally, in your base template (likely named ```base.html```), you need to add t
     {% endif %}
 {% endif %}
 ```
-and the following *after* your ```body``` tags: 
+and the following *after* the closing `</body>` and before `</html>`: 
 ```
 {% if article %}
     {% if article.scripts %}
@@ -62,6 +69,7 @@ and the following *after* your ```body``` tags:
     {% endif %}
 {% endif %}
 ```
+The same can be done for pages.
 
 Using D3 or/and three.js in a Blog Post
 ------------------------------------
@@ -92,4 +100,4 @@ Ensure that your js files are loaded *after* your body tags (as outlined above) 
 TODO
 ----
 
-Refer to [snippets/readme.md](snippets/readme.md) for more information.
+Refer to [snippets/readme.md](snippets/readme.md) for additional information.

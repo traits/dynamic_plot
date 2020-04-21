@@ -22,18 +22,22 @@ The replacement part is working yet in preliminary form:
      
   `example.md`:
     ``` 
-    Title: Dynamic Example
-    Summary: ...
-    Dynamic_plot: true       #  this has to be rearranged
-    Scripts: leibniz_d3.js   #             -"-
-    Styles: leibniz_d3.css   #             -"-
-    Output_strategy:         #  both/placeholder_only/dynamic_only?    
-
+    title: Dynamic Example
+    summary: ...
+    dynamic_plot: true   
+    d3_root:    'https://d3js.org/'
+    d3_file:    'd3.v4.min.js'                # implemented
+    three_root: 'https://threejs.org/build/'    
+    three_file: 'three.min.js'
+    place_holders: false,
+    scripts: leibniz_d3.js   
+    styles: leibniz_d3.css  
+  
     [...]
 
-    <div class="leibniz-spiral" class="placeholder_only" style=[...]></div>
+    <div class="leibniz-spiral" style=[...]></div>
     ``` 
 
-- extend functionality to three.js ([utilizing THREE.SVGRenderer?](https://threejs.org/docs/#examples/en/renderers/SVGRenderer))
+- extend functionality to three.js ([SVGRenderer?](https://threejs.org/docs/#examples/en/renderers/SVGRenderer) [, exporter?](https://github.com/elifitch/three-svg-export/blob/master/src/index.js))
 - generally more configuration and automation regarding the Pelican workflow
-- configure maintenance of local d3/three css
+- configurability of d3/three variants
