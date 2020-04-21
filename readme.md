@@ -18,10 +18,10 @@ Next, create `js` and `css` directories in your `content` directory:
   site/
     ├── content
     │   ├── js/
-    │   │   └── d3_example.js
-    │   │   └── three_example.js
+    │   │   └── leibniz_d3.js
+    │   │   └── sphere_three.js
     │   ├── css/
-    │   │   └── d3_styles.css
+    │   │   └── leibniz_d3.css
     │   ├── articles/
     │   │   └── article.md
     │   └── pages
@@ -29,14 +29,14 @@ Next, create `js` and `css` directories in your `content` directory:
     └── pelicanconf.py
 ```
 
-and then add each resource as a comma-separated file name in the `Scripts` and `Styles` tags: 
+and then add each resource as a comma-separated file name in the `scripts` and `styles` tags: 
 ```
 title: Using D3.js and three.js
 date: 2020-04-16
 category: blog
 summary: D3 and three.js usage...
 dynamic_plot: true
-d3_file: d3.v5.min.js
+d3_script: d3.v5.min.js
 scripts: leibniz_d3.js, sphere_three.js
 styles: leibniz_d3.css
 ```
@@ -45,9 +45,9 @@ styles: leibniz_d3.css
   
   If `true`, D3 and three processing for this article will be turned on. All of the JS and CSS will be copied in corresponding `js` and `css` folders in your `output` folder. 
 
-- `d3_file` (default: `'d3.v4.min.js'`): 
+- `d3_script` (default: `'d3.v4.min.js'`): 
   
-  Changes the D3 variant at article level into `f'https://d3js.org/{d3_file}'`. 
+  Changes the D3 variant at article level into `f'https://d3js.org/{d3_script}'`. 
 
 Finally, in your base template (likely named `base.html`), you need to add the following in your `head` tags: 
 ```

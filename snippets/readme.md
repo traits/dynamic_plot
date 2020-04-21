@@ -25,10 +25,10 @@ The replacement part is working yet in preliminary form:
     title: Dynamic Example
     summary: ...
     dynamic_plot: true   
-    d3_root:    'https://d3js.org/'
-    d3_file:    'd3.v4.min.js'                # implemented
-    three_root: 'https://threejs.org/build/'    
-    three_file: 'three.min.js'
+    d3_root:    https://d3js.org/
+    d3_script:  d3.v4.min.js                # implemented
+    three_root: https://threejs.org/build/    
+    three_script: three.min.js
     place_holders: false,
     scripts: leibniz_d3.js   
     styles: leibniz_d3.css  

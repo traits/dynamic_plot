@@ -72,10 +72,10 @@ def add_tags(gen, metadata):
         if metadata['dynamic_plot'] == 'true':
             three_script = '<script src="https://threejs.org/build/three.min.js"></script>'
             metadata['scripts'].insert(0, three_script)
-            d3_file = 'd3.v4.min.js'
-            if 'd3_file' in metadata.keys():
-                d3_file = metadata['d3_file']
-            d3_script = f'<script src="https://d3js.org/{d3_file}"></script>'
+            d3_script = 'd3.v4.min.js'
+            if 'd3_script' in metadata.keys():
+                d3_script = metadata['d3_script']
+            d3_script = f'<script src="https://d3js.org/{d3_script}"></script>'
             metadata['scripts'].insert(0, d3_script)
 
 
