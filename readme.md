@@ -1,7 +1,7 @@
 dynamic_plot
 ============
 
-Pelican plugin for embedding custom CSS and JS related to [D3](https://d3js.org/) and [three.js](https://threejs.org/) into individual Pelican blog articles. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic).
+Pelican plugin for embedding custom CSS and JS related to [D3](https://d3js.org/) and [three.js](https://threejs.org/) into individual Pelican blog articles. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic). Live example [here.](https://depot.traits.de/articles/2020/04/16-using-d3-and-threejs.html#using-d3-and-threejs)
 
 How
 ---
