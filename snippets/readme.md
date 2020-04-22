@@ -1,6 +1,6 @@
 ## Placeholders
 
-Example D3 script containing a helper function for saving a D3-rendered scene by browser download (JavaScript doesn't allow local file system access). This can be used as placeholder for strict script-less requirements.
+This directory contains an example D3 script, containing a helper function for saving a D3-rendered scene by browser download (JavaScript doesn't allow local file system access). This can be used as placeholder for strict script-less requirements.
 
 The replacement part is working yet in preliminary form:
 
@@ -15,10 +15,7 @@ The replacement part is working yet in preliminary form:
 #### TODO
 
 - embedding separate css style automatically into saved svg (see [`leibniz_d3.svg`](./leibniz_d3.svg) for a result, which was created manually from D3 svg output and [`leibniz_d3.css`](./leibniz_d3.css))
-- finer scripting switch granulation in Pelican output during content creation: script-only, noscript-only variants:
-
-    - configured as Pelican tag in markdown file
-    - configured as container attribute for individual embeddings: 
+- support for local D3 and three.js installations
      
   `example.md`:
     ``` 
@@ -26,18 +23,11 @@ The replacement part is working yet in preliminary form:
     summary: ...
     dynamic_plot: true   
     d3_root:    https://d3js.org/
-    d3_script:  d3.v4.min.js                # implemented
+    d3_master:  d3.v4.min.js                # implemented
     three_root: https://threejs.org/build/    
-    three_script: three.min.js
+    three_master: three.min.js
     place_holders: false,
-    scripts: leibniz_d3.js   
-    styles: leibniz_d3.css  
-  
-    [...]
-
-    <div class="leibniz-spiral" style=[...]></div>
     ``` 
 
-- extend functionality to three.js ([SVGRenderer?](https://threejs.org/docs/#examples/en/renderers/SVGRenderer) [, exporter?](https://github.com/elifitch/three-svg-export/blob/master/src/index.js))
+- extend placeholder functionality to three.js ([SVGRenderer?](https://threejs.org/docs/#examples/en/renderers/SVGRenderer) [, exporter?](https://github.com/elifitch/three-svg-export/blob/master/src/index.js))
 - generally more configuration and automation regarding the Pelican workflow
-- configurability of d3/three variants

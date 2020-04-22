@@ -32,9 +32,9 @@ vis.append("path")
     .attr("class", "spiral")
     .attr("d", arc.join(" "));
 
-function saveSvg(svgEl, name) {
-    svgEl.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    var svgData = svgEl.outerHTML;
+function saveSvg(svg, name) {
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    var svgData = svg.outerHTML;
     var preface = '<?xml version="1.0" standalone="no"?>\r\n';
     var svgBlob = new Blob([preface, svgData], {type:"image/svg+xml;charset=utf-8"});
     var svgUrl = URL.createObjectURL(svgBlob);
@@ -46,4 +46,4 @@ function saveSvg(svgEl, name) {
     document.body.removeChild(downloadLink);
 }
 
-saveSvg(vis.node().parentNode, 'test_01.svg')
+saveSvg(vis.node().parentNode, 'leibniz_3d.svg')

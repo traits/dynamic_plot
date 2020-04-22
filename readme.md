@@ -1,16 +1,20 @@
-dynamic_plot
-============
+## dynamic_plot
 
-Pelican plugin for embedding custom CSS and JS related to [D3](https://d3js.org/) and [three.js](https://threejs.org/) into individual Pelican blog articles. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic). Live example [here.](https://depot.traits.de/articles/2020/04/16-using-d3-and-threejs.html#using-d3-and-threejs)
+Pelican plugin for embedding custom CSS and JS related to [D3](https://d3js.org/) and [three.js](https://threejs.org/) into individual Pelican blog articles. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic). A live example can be found [here.](https://depot.traits.de/articles/2020/04/16-using-d3-and-threejs.html#using-d3-and-threejs)
 
-How
----
+### How
+
 To install the plugin, follow the instructions on the [Pelican plugin page.](https://github.com/getpelican/pelican-plugins): 
 
 
 `pelicanconf.py`:
 ```python
 PLUGINS = ['dynamic_plot']
+
+DYNAMIC_PLOT_OPTIONS = {
+    # 'dynamic_plots': None (default), 'all', 'd3', 'three'
+    # 'd3_master' : 'd3.v5.min.js' (default) 
+}
 ```
 
 Next, create `js` and `css` directories in your `content` directory: 
@@ -29,31 +33,34 @@ Next, create `js` and `css` directories in your `content` directory:
     └── pelicanconf.py
 ```
 
-and then add each resource as a comma-separated file name in the `scripts` and `styles` tags: 
+and then add each resource as a comma-separated file name in the `dp_scripts` and `dp_styles` tags: 
 ```
 title: Using D3.js and three.js
 date: 2020-04-16
-category: blog
 summary: D3 and three.js usage...
-dynamic_plot: true
-d3_script: d3.v5.min.js
-scripts: leibniz_d3.js, sphere_three.js
-styles: leibniz_d3.css
+dynamic_plots: all
+d3_master: d3.v4.js
+dp_scripts: leibniz_d3.js, sphere_three.js
+dp_styles: leibniz_d3.css
 ```
 
-- `dynamic_plot` (default `None`): 
+- `dynamic_plots` (default `None`): 
   
-  If `true`, D3 and three processing for this article will be turned on. All of the JS and CSS will be copied in corresponding `js` and `css` folders in your `output` folder. 
+  Values: `None` (default), `'all'`, `'d3'`, `'three'` 
 
-- `d3_script` (default: `'d3.v4.min.js'`): 
+- `d3_master` (default: `'d3.v5.min.js'`): 
   
-  Changes the D3 variant at article level into `f'https://d3js.org/{d3_script}'`. 
+  Changes the D3 variant into `f'https://d3js.org/{d3_script}'`. 
+
+Options are evaluated with increasing priority: defaults -> pelican.conf -> article/page. Processing occurs only if `dynamic_plots != None`. Currently no local installations of the two JavaScript libraries are supported. All of the JS and CSS will be copied in corresponding `js` and `css` folders in your `output` folder. 
+
+
 
 Finally, in your base template (likely named `base.html`), you need to add the following in your `head` tags: 
 ```
 {% if article %}
-    {% if article.styles %}
-        {% for style in article.styles %}
+    {% if article.dp_styles %}
+        {% for style in article.dp_styles %}
 {{ style }}
         {% endfor %}
     {% endif %}
@@ -62,8 +69,8 @@ Finally, in your base template (likely named `base.html`), you need to add the f
 and the following *after* the closing `</body>` and before `</html>`: 
 ```
 {% if article %}
-    {% if article.scripts %}
-        {% for script in article.scripts %}
+    {% if article.dp_scripts %}
+        {% for script in article.dp_scripts %}
 {{ script }}
         {% endfor %}
     {% endif %}
@@ -95,7 +102,6 @@ or in three:
 var el = document.querySelector('.three-sphere');
 el.appendChild(renderer.domElement);
 ```
-
 
 Ensure that your js files are loaded *after* your body tags (as outlined above) so that it selects an existing element on the page. 
 
