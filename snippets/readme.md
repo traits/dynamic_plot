@@ -21,7 +21,7 @@ The replacement part is working yet in preliminary form:
     ``` 
     title: Dynamic Example
     summary: ...
-    dynamic_plot: true   
+    dynamic_plots: all   
     d3_root:    https://d3js.org/
     d3_master:  d3.v4.min.js                # implemented
     three_root: https://threejs.org/build/    

@@ -46,7 +46,7 @@ def format_resource(gen, metastring, formatter):
     gen: generator
         Pelican Generator
     metastring: string
-        metadata['scripts'] or metadata['styles']
+        metadata['dp_scripts'] or metadata['dp_styles']
     formatter: string
         String format for output.
 
