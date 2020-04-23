@@ -109,4 +109,7 @@ Ensure that your js files are loaded *after* your body tags (as outlined above) 
 TODO
 ----
 
+- Support of stricter non-scripting policies by [semi-]automatically created placeholders. 
+- Supporting local D3 and three.js installations
+
 Refer to [snippets/readme.md](snippets/readme.md) for additional information.

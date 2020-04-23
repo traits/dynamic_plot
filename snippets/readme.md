@@ -29,5 +29,5 @@ Straightforward placeholding can be done independently of this simply by includi
     dp_scripts: (a.js, a_placeholder.svg),... # tuples possible? 
     ``` 
 
-- extend placeholder functionality to three.js ([SVGRenderer?](https://threejs.org/docs/#examples/en/renderers/SVGRenderer) [, exporter?](https://github.com/elifitch/three-svg-export/blob/master/src/index.js))
+- extend placeholder functionality to three.js ([SVGRenderer,](https://threejs.org/docs/#examples/en/renderers/SVGRenderer) [ three-svg-export?](https://github.com/elifitch/three-svg-export)) 
 - generally more configuration and automation regarding the Pelican workflow
