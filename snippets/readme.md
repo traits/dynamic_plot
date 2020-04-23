@@ -2,7 +2,7 @@
 
 This directory contains an example D3 script, containing a helper function for saving a D3-rendered scene by browser download (JavaScript doesn't allow local file system access). This can be used as placeholder for strict script-less requirements.
 
-The replacement part is working yet in preliminary form:
+Straightforward placeholding can be done independently of this simply by including a suiting prepared image.:
 
 `example.md:`
 ```
@@ -23,10 +23,10 @@ The replacement part is working yet in preliminary form:
     summary: ...
     dynamic_plots: all   
     d3_root:    https://d3js.org/
-    d3_master:  d3.v4.min.js                # implemented
+    d3_master:  d3.v4.min.js                  # implemented
     three_root: https://threejs.org/build/    
     three_master: three.min.js
-    place_holders: false,
+    dp_scripts: (a.js, a_placeholder.svg),... # tuples possible? 
     ``` 
 
 - extend placeholder functionality to three.js ([SVGRenderer?](https://threejs.org/docs/#examples/en/renderers/SVGRenderer) [, exporter?](https://github.com/elifitch/three-svg-export/blob/master/src/index.js))

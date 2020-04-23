@@ -1,6 +1,6 @@
 ## dynamic_plot
 
-Pelican plugin for embedding custom [D3](https://d3js.org/)- and [three.js](https://threejs.org/)-based scripts CSS. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic). A live example can be found [here.](https://depot.traits.de/articles/2020/04/16-using-d3-and-threejs.html#using-d3-and-threejs)
+Pelican plugin for embedding custom [D3](https://d3js.org/) and [three.js](https://threejs.org/) scripts and associated CSS. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic). A live example can be found [here.](https://depot.traits.de/articles/2020/04/16-using-d3-and-threejs.html#using-d3-and-threejs)
 
 ### How
 
@@ -50,9 +50,9 @@ dp_styles: leibniz_d3.css
 
 - `d3_master` (default: `'d3.v5.min.js'`): 
   
-  Changes the D3 variant into `f'https://d3js.org/{d3_script}'`. 
+  Changes the blog outputs D3 reference into `f'https://d3js.org/{d3_script}'`. 
 
-Options are evaluated with increasing priority: defaults -> pelican.conf -> article/page. Processing occurs only if `dynamic_plots != None`. Currently no local installations of the two JavaScript libraries are supported. All of the JS and CSS will be copied in corresponding `js` and `css` folders in your `output` folder. 
+Options are evaluated with increasing priority: defaults -> pelican.conf -> article/page. Processing occurs only if `dynamic_plots != None`. Currently no local installations of the two JavaScript libraries are supported. All JS and CSS will be copied in corresponding `js` and `css` folders in your `output` folder. 
 
 
 
@@ -92,12 +92,12 @@ D3 plot in blog post:
 <div class="three-sphere" style="width:600px; height:400px;"></div>
 ```
 
-Then with D3, make sure you're selecting that element: 
+Then within your D3 script, make sure you're selecting that element: 
 
 ```javascript
 var svg = d3.select(".leibniz-spiral").append("svg")
 ```
-or in three:
+or if using three:
 ```javascript
 var el = document.querySelector('.three-sphere');
 el.appendChild(renderer.domElement);
