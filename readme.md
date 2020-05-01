@@ -13,24 +13,9 @@ PLUGINS = ['dynamic_plot']
 
 DYNAMIC_PLOT_OPTIONS = {
     # 'dynamic_plots': None (default), 'all', 'd3', 'three'
+    # 'dp_scripts_location': None (default), 'central/path/to/scripts'
     # 'd3_master' : 'd3.v5.min.js' (default) 
 }
-```
-
-Next, create `js` and `css` directories in your `content` directory: 
-```
-  site/
-    ├── content
-    │   ├── js/
-    │   │   └── leibniz_d3.js
-    │   │   └── sphere_three.js
-    │   ├── css/
-    │   │   └── leibniz_d3.css
-    │   ├── articles/
-    │   │   └── article.md
-    │   └── pages
-    │       └── about.md
-    └── pelicanconf.py
 ```
 
 and then add each resource as a comma-separated file name in the `dp_scripts` and `dp_styles` tags: 
@@ -40,21 +25,29 @@ date: 2020-04-16
 summary: D3 and three.js usage...
 dynamic_plots: all
 d3_master: d3.v4.js
+dp_scripts_location: 'js'
 dp_scripts: leibniz_d3.js, sphere_three.js
 dp_styles: leibniz_d3.css
 ```
 
-- `dynamic_plots` (default `None`): 
+- `dynamic_plots`: Values: `'all'`, `'d3'`, `'three'`  
+  There is no default value, you must set one of the valid values, to allow processing of dynamic plots for every single article or page. 
+  - `'all'`:  d3 and three.js scripts are considered
+  - `'d3'`:  only d3 scripts are considered
+  - `'three'`:  only three.js scripts are considered  
   
-  Values: `None` (default), `'all'`, `'d3'`, `'three'` 
+    (The `d3` and `three` options avoid creation of unnecessary references to the libraries master scripts in HTML output. They don't hurt, though.) 
 
-- `d3_master` (default: `'d3.v5.min.js'`): 
-  
+- `dp_scripts_location`: Values: `None` (default), `path/to/scripts/for/this/article`   
+  The default will search for user scripts and css in the blog entries directory, otherwise the specified path is used.
+
+- `d3_master`: (default: `'d3.v5.min.js'`)  
   Changes the blog outputs D3 reference into `f'https://d3js.org/{d3_script}'`. 
 
-Options are evaluated with increasing priority: defaults -> pelican.conf -> article/page. Processing occurs only if `dynamic_plots != None`. Currently no local installations of the two JavaScript libraries are supported. All JS and CSS will be copied in corresponding `js` and `css` folders in your `output` folder. 
+- `dp_scripts`:  The users JS files for this blog entry  
+- `dp_styles`:  The users CSS files for this blog entry  
 
-
+Options are evaluated with increasing priority: defaults -> pelican.conf -> article/page. Processing occurs only if `dynamic_plots != None`. Currently no local installations of the two JavaScript libraries are supported. All JS and CSS will be copied to `output` folder, according to the value of `dp_scripts_location`. 
 
 Finally, in your base template (likely named `base.html`), you need to add the following in your `head` tags: 
 ```
