@@ -2,6 +2,10 @@
 
 Pelican plugin for embedding custom [D3](https://d3js.org/) and [three.js](https://threejs.org/) scripts and associated CSS. This is a rewrite/extension of [Rob Story's plugin](https://github.com/wrobstory/pelican_dynamic). A live example can be found [here.](https://depot.traits.de/articles/2020/04/16-using-d3-and-threejs.html#using-d3-and-threejs)
 
+### Requirements
+
+Python >= 3.6
+
 ### How
 
 To install the plugin, follow the instructions on the [Pelican plugin page.](https://github.com/getpelican/pelican-plugins): 

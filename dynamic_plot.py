@@ -127,7 +127,7 @@ def evaluate_tags(gen, content):
     if styles:
         all_files += styles.replace(" ", "").split(",")
 
-    file_destinations = []
+    files = []
     for f in all_files:
         src = None
         dst = None
@@ -138,7 +138,7 @@ def evaluate_tags(gen, content):
             src = content_root / f[1:]
             dst = output_root / f[1:]
 
-        file_destinations.append([src, dst])
+        files.append([src.resolve(), dst.resolve()])
 
     if scripts:
         #  user scripts
