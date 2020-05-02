@@ -7,15 +7,17 @@ This plugin allows you to easily embed D3 and three.js JS and CSS in Pelicans co
 """
 import os
 import shutil
+from pathlib import Path
 
 import wingdbstub
 
 from pelican import signals
 
 DP_DEFAULT = {
-    'd3_master': 'd3.v5.min.js',
+    "dynplot_d3_url": "https://d3js.org/d3.v5.min.js",
+    "dynplot_three_url": "https://threejs.org/build/three.min.js",
 }
-DP_KEY = 'DYNAMIC_PLOT_OPTIONS'
+DP_KEY = "DYNAMIC_PLOT_OPTIONS"
 
 
 def init_default_config(pelican):
@@ -45,6 +47,15 @@ def get_effective_option(metadata, settings, key):
     return metadata.get(key, settings[DP_KEY].get(key))
 
 
+def is_relative(fname):
+    """
+    Returns True for leading '/', False else    
+    """
+    if fname and "/" == fname[0]:
+        return True
+    return False
+
+
 def format_resource(gen, metastring, formatter):
     """
     Create a list of URL-formatted script/style tags
@@ -61,9 +72,13 @@ def format_resource(gen, metastring, formatter):
     Output
     ------
     List of formatted strings
+    
+    script = '<script type="module" src="{0}/js/{1}"></script>'
+    metadata["dp_scripts"] = format_resource(gen, scripts, script)    
     """
-    metalist = metastring.replace(" ", "").split(',')
-    site_url = gen.settings['SITEURL']
+
+    metalist = metastring.replace(" ", "").split(",")
+    site_url = gen.settings["SITEURL"]
     return [formatter.format(site_url, x) for x in metalist]
 
 
@@ -91,7 +106,7 @@ def copy_resources(src, dest, file_list):
         shutil.copy2(file_src, dest)
 
 
-csp = ''
+csp = ""
 
 
 def get_content_info(content):
@@ -99,7 +114,7 @@ def get_content_info(content):
     Get path info for currently processed item here
     """
 
-    scripts_location = content.metadata.get('dp_scripts_location')
+    scripts_location = content.metadata.get("dp_scripts_location")
     csp = content.relative_source_path  # content.metadata content.settings
 
 
@@ -108,37 +123,42 @@ def add_tags(gen, metadata):
         The registered handler for the dynamic resources plugin. It will
         add the scripts and/or styles to the article
     """
-    dp_allowed = metadata.get('dynamic_plots')
-    use_three = dp_allowed or dp_allowed == 'three'
-    use_d3 = dp_allowed or dp_allowed == 'd3'
-    scripts = metadata.get('dp_scripts')
+    scripts = metadata.get("dynplot_scripts")
     if scripts:
+        #  user scripts
         script = '<script type="module" src="{0}/js/{1}"></script>'
-        metadata['dp_scripts'] = format_resource(gen, scripts, script)
-    styles = metadata.get('dp_styles')
+        metadata["dynplot_scripts"] = format_resource(gen, scripts, script)
+        # D3 url
+        url = get_effective_option(metadata, gen.settings, "dynplot_d3_url")
+        url = f'<script src="{url}"></script>'
+        metadata["dynplot_scripts"].insert(0, url)
+        # three.js url
+        url = get_effective_option(metadata, gen.settings, "dynplot_three_url")
+        url = f'<script src="{url}"></script>'
+        metadata["dynplot_scripts"].insert(0, url)
+    styles = metadata.get("dynplot_styles")
     if styles:
         style = '<link rel="stylesheet" href="{0}/css/{1}" type="text/css" />'
-        metadata['dp_styles'] = format_resource(gen, styles, style)
-    if use_three == True:
-        metadata['dp_scripts'].insert(0, '<script src="https://threejs.org/build/three.min.js"></script>')
-    if use_d3 == True:
-        d3_master = get_effective_option(metadata, gen.settings, 'd3_master')
-        d3_master = f'<script src="https://d3js.org/{d3_master}"></script>'
-        metadata['dp_scripts'].insert(0, d3_master)
+        metadata["dynplot_styles"] = format_resource(gen, styles, style)
     csp = None
+
+
+def copy_files_to_target(pelican):
+    filemapping = {}
+    pass
 
 
 def move_resources(gen):
     """
     Move files from js/css folders to output folder
     """
-    js_files = gen.get_files('js', extensions='js')
-    css_files = gen.get_files('css', extensions='css')
+    js_files = gen.get_files("js", extensions="js")
+    css_files = gen.get_files("css", extensions="css")
 
-    js_dest = os.path.join(gen.output_path, 'js')
+    js_dest = os.path.join(gen.output_path, "js")
     copy_resources(gen.path, js_dest, js_files)
 
-    css_dest = os.path.join(gen.output_path, 'css')
+    css_dest = os.path.join(gen.output_path, "css")
     copy_resources(gen.path, css_dest, css_files)
 
 
@@ -151,3 +171,4 @@ def register():
     signals.article_generator_context.connect(add_tags)
     signals.page_generator_context.connect(add_tags)
     signals.article_generator_finalized.connect(move_resources)
+    signals.finalized.connect(copy_files_to_target)

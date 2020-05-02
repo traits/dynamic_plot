@@ -21,12 +21,8 @@ Straightforward placeholding can be done independently of this simply by includi
     ``` 
     title: Dynamic Example
     summary: ...
-    dynamic_plots: all   
-    d3_root:    https://d3js.org/
-    d3_master:  d3.v4.min.js                  # implemented
-    three_root: https://threejs.org/build/    
-    three_master: three.min.js
-    dp_scripts: (a.js, a_placeholder.svg),... # tuples possible? 
+    dynplot_d3_url:  https://d3js.org/d3.v4.min.js  # implemented
+    dynplot_scripts: (a.js, a_placeholder.svg),...  # tuples possible? 
     ``` 
 
 - extend placeholder functionality to three.js ([SVGRenderer,](https://threejs.org/docs/#examples/en/renderers/SVGRenderer) [ three-svg-export?](https://github.com/elifitch/three-svg-export)) 
