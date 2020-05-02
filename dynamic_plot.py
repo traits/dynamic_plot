@@ -51,7 +51,7 @@ def is_relative(fname):
     """
     Returns True for leading '/', False else    
     """
-    if fname and "/" == fname[0]:
+    if fname and (fname[0] != "/"):
         return True
     return False
 
@@ -65,7 +65,7 @@ def format_resource(gen, metastring, formatter):
     gen: generator
         Pelican Generator
     metastring: string
-        metadata['dp_scripts'] or metadata['dp_styles']
+        metadata['dynplot_scripts'] or metadata['dynplot_styles']
     formatter: string
         String format for output.
 
@@ -106,46 +106,51 @@ def copy_resources(src, dest, file_list):
         shutil.copy2(file_src, dest)
 
 
-csp = ""
-
-
-def get_content_info(content):
+def evaluate_tags(gen, content):
     """
-    Get path info for currently processed item here
+    Receive generator, content and metadata at a single point
+    and extract relevant information
     """
+    metadata = content.metadata
+    src_dir = Path(content.relative_dir)
+    dst_dir = Path(content.url).parent
+    content_root = Path(gen.path)
+    output_root = Path(gen.output_path)
 
-    scripts_location = content.metadata.get("dp_scripts_location")
-    csp = content.relative_source_path  # content.metadata content.settings
-
-
-def add_tags(gen, metadata):
-    """
-        The registered handler for the dynamic resources plugin. It will
-        add the scripts and/or styles to the article
-    """
     scripts = metadata.get("dynplot_scripts")
+    styles = metadata.get("dynplot_styles")
+
+    all_files = []
+
+    if scripts:
+        all_files += scripts.replace(" ", "").split(",")
+    if styles:
+        all_files += styles.replace(" ", "").split(",")
+
+    file_destinations = []
+    for f in all_files:
+        src = None
+        dst = None
+        if is_relative(f):
+            src = content_root / src_dir / f
+            dst = output_root / dst_dir / f
+        else:
+            src = content_root / f[1:]
+            dst = output_root / f[1:]
+
+        file_destinations.append([src, dst])
+
     if scripts:
         #  user scripts
         script = '<script type="module" src="{0}/js/{1}"></script>'
         metadata["dynplot_scripts"] = format_resource(gen, scripts, script)
-        # D3 url
-        url = get_effective_option(metadata, gen.settings, "dynplot_d3_url")
-        url = f'<script src="{url}"></script>'
-        metadata["dynplot_scripts"].insert(0, url)
-        # three.js url
-        url = get_effective_option(metadata, gen.settings, "dynplot_three_url")
-        url = f'<script src="{url}"></script>'
-        metadata["dynplot_scripts"].insert(0, url)
-    styles = metadata.get("dynplot_styles")
+        for url_tag in ["dynplot_d3_url", "dynplot_three_url"]:
+            url = get_effective_option(metadata, gen.settings, url_tag)
+            url = f'<script src="{url}"></script>'
+            metadata["dynplot_scripts"].insert(0, url)
     if styles:
         style = '<link rel="stylesheet" href="{0}/css/{1}" type="text/css" />'
         metadata["dynplot_styles"] = format_resource(gen, styles, style)
-    csp = None
-
-
-def copy_files_to_target(pelican):
-    filemapping = {}
-    pass
 
 
 def move_resources(gen):
@@ -167,8 +172,7 @@ def register():
         Plugin registration
     """
     signals.initialized.connect(init_default_config)
-    signals.content_object_init.connect(get_content_info)
-    signals.article_generator_context.connect(add_tags)
-    signals.page_generator_context.connect(add_tags)
+    signals.article_generator_write_article.connect(evaluate_tags)
+    signals.page_generator_write_page.connect(evaluate_tags)
     signals.article_generator_finalized.connect(move_resources)
-    signals.finalized.connect(copy_files_to_target)
+    # signals.finalized.connect(copy_files_to_target)

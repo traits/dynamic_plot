@@ -48,8 +48,8 @@ Finally, in your base template (likely named `base.html`), you need to add the f
 and the following *after* the closing `</body>` and before `</html>`: 
 ```
 {% if article %}
-    {% if article.dynplot_d3 %}
-        {% for script in article.dynplot_d3 %}
+    {% if article.dynplot_scripts %}
+        {% for script in article.dynplot_scripts %}
 {{ script }}
         {% endfor %}
     {% endif %}
@@ -58,7 +58,7 @@ and the following *after* the closing `</body>` and before `</html>`:
 The same can be done for pages.
 
 Using D3 or/and three.js in a Blog Post
-------------------------------------
+---------------------------------------
 With Markdown, this is pretty easy. Just add the raw HTML for your chart element in the middle of your markdown text: 
 
 ```
