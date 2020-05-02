@@ -19,6 +19,8 @@ DP_DEFAULT = {
 }
 DP_KEY = "DYNAMIC_PLOT_OPTIONS"
 
+file_mapping = []
+
 
 def init_default_config(pelican):
     """
@@ -56,32 +58,6 @@ def is_relative(fname):
     return False
 
 
-def format_resource(gen, metastring, formatter):
-    """
-    Create a list of URL-formatted script/style tags
-
-    Parameters
-    ----------
-    gen: generator
-        Pelican Generator
-    metastring: string
-        metadata['dynplot_scripts'] or metadata['dynplot_styles']
-    formatter: string
-        String format for output.
-
-    Output
-    ------
-    List of formatted strings
-    
-    script = '<script type="module" src="{0}/js/{1}"></script>'
-    metadata["dp_scripts"] = format_resource(gen, scripts, script)    
-    """
-
-    metalist = metastring.replace(" ", "").split(",")
-    site_url = gen.settings["SITEURL"]
-    return [formatter.format(site_url, x) for x in metalist]
-
-
 def copy_resources(src, dest, file_list):
     """
     Copy files from content folder to output folder
@@ -106,29 +82,22 @@ def copy_resources(src, dest, file_list):
         shutil.copy2(file_src, dest)
 
 
-def evaluate_tags(gen, content):
-    """
-    Receive generator, content and metadata at a single point
-    and extract relevant information
-    """
+def get_mapping(gen, content, tag, formatter):
     metadata = content.metadata
     src_dir = Path(content.relative_dir)
     dst_dir = Path(content.url).parent
     content_root = Path(gen.path)
     output_root = Path(gen.output_path)
 
-    scripts = metadata.get("dynplot_scripts")
-    styles = metadata.get("dynplot_styles")
+    files_str = metadata.get(tag)
 
-    all_files = []
+    if not files_str:
+        return []
 
-    if scripts:
-        all_files += scripts.replace(" ", "").split(",")
-    if styles:
-        all_files += styles.replace(" ", "").split(",")
+    file_list = files_str.replace(" ", "").split(",")
 
-    files = []
-    for f in all_files:
+    result = []
+    for f in file_list:
         src = None
         dst = None
         if is_relative(f):
@@ -138,19 +107,42 @@ def evaluate_tags(gen, content):
             src = content_root / f[1:]
             dst = output_root / f[1:]
 
-        files.append([src.resolve(), dst.resolve()])
+        url = Path(f).as_posix()
+        include = formatter.format(url)
+        result.append([src.resolve(), dst.resolve(), include])
 
+    return result
+
+
+def evaluate_tags(gen, content):
+    """
+    Receive generator, content and metadata at a single point
+    and extract relevant information
+    """
+    metadata = content.metadata
+    scripts = get_mapping(
+        gen, content, "dynplot_scripts", '<script type="module" src="{0}"></script>',
+    )
+    styles = get_mapping(
+        gen,
+        content,
+        "dynplot_styles",
+        '<link rel="stylesheet" href="{0}" type="text/css" />',
+    )
+    global file_mapping
     if scripts:
+        file_mapping += scripts
         #  user scripts
-        script = '<script type="module" src="{0}/js/{1}"></script>'
-        metadata["dynplot_scripts"] = format_resource(gen, scripts, script)
+        metadata["dynplot_scripts"] = [x[2] for x in scripts]
+        #  master scripts
         for url_tag in ["dynplot_d3_url", "dynplot_three_url"]:
             url = get_effective_option(metadata, gen.settings, url_tag)
             url = f'<script src="{url}"></script>'
             metadata["dynplot_scripts"].insert(0, url)
     if styles:
-        style = '<link rel="stylesheet" href="{0}/css/{1}" type="text/css" />'
-        metadata["dynplot_styles"] = format_resource(gen, styles, style)
+        file_mapping += styles
+        # user styles
+        metadata["dynplot_styles"] = [x[2] for x in styles]
 
 
 def move_resources(gen):
