@@ -3,8 +3,11 @@
 Embedding D3 and three.js for Pelican
 =====================================
 
-This plugin allows you to easily embed D3 and three.js JS and CSS in Pelicans configuration and also the header of individual articles. It also allows for single-tag embedding of D3.js.
+This plugin allows you to easily embed D3 and three.js JS and CSS in Pelicans 
+configuration and also the header of individual articles or pages. 
+It also allows for for embedding article-specific D3.js versions.
 """
+
 import os
 import shutil
 from pathlib import Path
@@ -177,6 +180,7 @@ def register():
     """
     Plugin registration
     """
+
     signals.initialized.connect(init_default_config)
     signals.content_object_init.connect(add_files)
     signals.finalized.connect(copy_files_to_destination)
