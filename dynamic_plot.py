@@ -48,6 +48,7 @@ def get_effective_option(metadata, settings, key):
     Return option with highest priority:
     not-defined key < default < pelican config settings < file metadata
     """
+
     return metadata.get(key, settings[DP_KEY].get(key))
 
 
@@ -55,12 +56,17 @@ def is_relative(fname):
     """
     Returns True for leading '/', False else    
     """
+
     if fname and (fname[0] != "/"):
         return True
     return False
 
 
-def copy_resources(gen):
+def copy_files_to_destination(gen):
+    """
+    Copy files to target destination
+    """
+
     global file_mapping
     for m in file_mapping:
         os.makedirs(os.path.dirname(str(m[1])), exist_ok=True)
@@ -68,10 +74,16 @@ def copy_resources(gen):
 
 
 def get_mapping(content, tag):
-    files_str = []
+    """
+    Return list of all file names from metadata enriched by
+    input/output path information
+    """
 
-    if hasattr(content, tag):
-        files_str = getattr(content, tag)
+    # see format_tags
+    if not hasattr(content, tag):
+        return []
+
+    files_str = getattr(content, tag)
 
     if not files_str:
         return []
@@ -100,10 +112,15 @@ def get_mapping(content, tag):
 
 
 def get_formatted_resource(content, tag, formatter):
-    files_str = []
+    """
+    Return list of html-tag-transformed raw filenames from metadata
+    """
 
-    if hasattr(content, tag):
-        files_str = getattr(content, tag)
+    # see format_tags
+    if not hasattr(content, tag):
+        return []
+
+    files_str = getattr(content, tag)
 
     if not files_str:
         return []
@@ -114,6 +131,10 @@ def get_formatted_resource(content, tag, formatter):
 
 
 def format_tags(content):
+    """
+    Provide html <script> and <link> tags for script/css files from metadata 
+    """
+
     scripts = get_formatted_resource(
         content, DP_SCRIPTS_KEY, '<script type="module" src="{0}"></script>'
     )
@@ -122,6 +143,9 @@ def format_tags(content):
     )
     if scripts:
         #  user scripts
+        ## Take care here, NOT to try modifying content.metadata["dynplot_scripts"]
+        ## etc.. These will no longer affect the values used for html output after
+        ## content creation
         content.dynplot_scripts = [x for x in scripts]
         #  master scripts
         for url_tag in ["dynplot_d3_url", "dynplot_three_url"]:
@@ -135,7 +159,7 @@ def format_tags(content):
 
 def add_files(content):
     """
-    Receive generator and content and extract relevant information
+    Receive content and extract relevant information for later usage
     """
 
     scripts = get_mapping(content, DP_SCRIPTS_KEY)
@@ -151,8 +175,8 @@ def add_files(content):
 
 def register():
     """
-        Plugin registration
+    Plugin registration
     """
     signals.initialized.connect(init_default_config)
     signals.content_object_init.connect(add_files)
-    signals.finalized.connect(copy_resources)
+    signals.finalized.connect(copy_files_to_destination)
