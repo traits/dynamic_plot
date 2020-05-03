@@ -9,7 +9,7 @@ import os
 import shutil
 from pathlib import Path
 
-import wingdbstub
+# import wingdbstub
 
 from pelican import signals
 
@@ -18,6 +18,20 @@ DP_DEFAULT = {
     "dynplot_three_url": "https://threejs.org/build/three.min.js",
 }
 DP_KEY = "DYNAMIC_PLOT_OPTIONS"
+DP_SCRIPTS_KEY = "dynplot_scripts"
+DP_STYLES_KEY = "dynplot_styles"
+
+# hack: (see https://github.com/getpelican/pelican-plugins/issues/1260)
+# We need the following temporary keys to maintain the original metadata
+# before they are converted into html tags in format_tags in order
+# to be able to use them in add_files.
+# Somewhere between the calls of the signals for article_generator_context (format_tags)
+# and article_generator_write_article (add_files) the metadata with the original key
+# is written using the themes template, so the html tag conversion cannot be postponed to
+# the article_generator_write_article handler.
+
+DP_SCRIPTS_KEY_TMP = DP_SCRIPTS_KEY + "_"
+DP_STYLES_KEY_TMP = DP_STYLES_KEY + "_"
 
 file_mapping = []
 
@@ -58,31 +72,14 @@ def is_relative(fname):
     return False
 
 
-def copy_resources(src, dest, file_list):
-    """
-    Copy files from content folder to output folder
-
-    Parameters
-    ----------
-    src: string
-        Content folder path
-    dest: string,
-        Output folder path
-    file_list: list
-        List of files to be transferred
-
-    Output
-    ------
-    Copies files from content to output
-    """
-    if not os.path.exists(dest):
-        os.makedirs(dest)
-    for file_ in file_list:
-        file_src = os.path.join(src, file_)
-        shutil.copy2(file_src, dest)
+def copy_resources(gen):
+    global file_mapping
+    for m in file_mapping:
+        os.makedirs(os.path.dirname(str(m[1])), exist_ok=True)
+        shutil.copy2(m[0], m[1])
 
 
-def get_mapping(gen, content, tag, formatter):
+def get_mapping(gen, content, tag):
     metadata = content.metadata
     src_dir = Path(content.relative_dir)
     dst_dir = Path(content.url).parent
@@ -107,56 +104,56 @@ def get_mapping(gen, content, tag, formatter):
             src = content_root / f[1:]
             dst = output_root / f[1:]
 
-        url = Path(f).as_posix()
-        include = formatter.format(url)
-        result.append([src.resolve(), dst.resolve(), include])
+        result.append([src.resolve(), dst.resolve()])
 
     return result
 
 
-def evaluate_tags(gen, content):
-    """
-    Receive generator, content and metadata at a single point
-    and extract relevant information
-    """
-    metadata = content.metadata
-    scripts = get_mapping(
-        gen, content, "dynplot_scripts", '<script type="module" src="{0}"></script>',
+def get_formatted_resource(metadata, tag, formatter):
+    files_str = metadata.get(tag)
+
+    if not files_str:
+        return []
+
+    file_list = files_str.replace(" ", "").split(",")
+
+    return [formatter.format(Path(f).as_posix()) for f in file_list]
+
+
+def format_tags(gen, metadata):
+    scripts = get_formatted_resource(
+        metadata, DP_SCRIPTS_KEY, '<script type="module" src="{0}"></script>'
     )
-    styles = get_mapping(
-        gen,
-        content,
-        "dynplot_styles",
-        '<link rel="stylesheet" href="{0}" type="text/css" />',
+    styles = get_formatted_resource(
+        metadata, DP_STYLES_KEY, '<link rel="stylesheet" href="{0}" type="text/css" />',
     )
-    global file_mapping
     if scripts:
-        file_mapping += scripts
         #  user scripts
-        metadata["dynplot_scripts"] = [x[2] for x in scripts]
+        metadata[DP_SCRIPTS_KEY_TMP] = metadata[DP_SCRIPTS_KEY]
+        metadata[DP_SCRIPTS_KEY] = [x for x in scripts]
         #  master scripts
         for url_tag in ["dynplot_d3_url", "dynplot_three_url"]:
             url = get_effective_option(metadata, gen.settings, url_tag)
             url = f'<script src="{url}"></script>'
-            metadata["dynplot_scripts"].insert(0, url)
+            metadata[DP_SCRIPTS_KEY].insert(0, url)
+    if styles:
+        # user styles
+        metadata[DP_STYLES_KEY_TMP] = metadata[DP_STYLES_KEY]
+        metadata[DP_STYLES_KEY] = [x for x in styles]
+
+
+def add_files(gen, content):
+    """
+    Receive generator and content and extract relevant information
+    """
+
+    scripts = get_mapping(gen, content, DP_SCRIPTS_KEY_TMP)
+    styles = get_mapping(gen, content, DP_STYLES_KEY_TMP)
+    global file_mapping
+    if scripts:
+        file_mapping += scripts
     if styles:
         file_mapping += styles
-        # user styles
-        metadata["dynplot_styles"] = [x[2] for x in styles]
-
-
-def move_resources(gen):
-    """
-    Move files from js/css folders to output folder
-    """
-    js_files = gen.get_files("js", extensions="js")
-    css_files = gen.get_files("css", extensions="css")
-
-    js_dest = os.path.join(gen.output_path, "js")
-    copy_resources(gen.path, js_dest, js_files)
-
-    css_dest = os.path.join(gen.output_path, "css")
-    copy_resources(gen.path, css_dest, css_files)
 
 
 def register():
@@ -164,7 +161,8 @@ def register():
         Plugin registration
     """
     signals.initialized.connect(init_default_config)
-    signals.article_generator_write_article.connect(evaluate_tags)
-    signals.page_generator_write_page.connect(evaluate_tags)
-    signals.article_generator_finalized.connect(move_resources)
-    # signals.finalized.connect(copy_files_to_target)
+    signals.article_generator_context.connect(format_tags)
+    signals.page_generator_context.connect(format_tags)
+    signals.article_generator_write_article.connect(add_files)
+    signals.page_generator_write_page.connect(add_files)
+    signals.finalized.connect(copy_resources)
