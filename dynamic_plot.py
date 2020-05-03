@@ -11,10 +11,13 @@ It also allows for for embedding article-specific D3.js versions.
 import os
 import shutil
 from pathlib import Path
+import logging
 
 # import wingdbstub
 
 from pelican import signals
+
+logger = logging.getLogger(__name__)
 
 DP_DEFAULT = {
     "dynplot_d3_url": "https://d3js.org/d3.v5.min.js",
@@ -72,6 +75,9 @@ def copy_files_to_destination(gen):
 
     global file_mapping
     for m in file_mapping:
+        if not m[0].exists():
+            logger.warning(f"dynamic_plot: source file not found ({str(m[0])})")
+            continue
         os.makedirs(os.path.dirname(str(m[1])), exist_ok=True)
         shutil.copy2(m[0], m[1])
 
