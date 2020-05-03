@@ -27,8 +27,8 @@ title: Using D3.js and three.js
 date: 2020-04-16
 summary: D3 and three.js usage...
 dynplot_d3_url: https://d3js.org/d3.v4.js
-dynplot_scripts: leibniz_d3.js, sphere_three.js
-dynplot_styles: leibniz_d3.css
+dynplot_scripts: leibniz_d3.js, sphere_three.js, ../up.js
+dynplot_styles: leibniz_d3.css, /global.css
 ```
 
 - `dynplot_d3_url`: (default: `'https://d3js.org/d3.v5.min.js'`)  
@@ -36,7 +36,7 @@ dynplot_styles: leibniz_d3.css
 - `dynplot_scripts`:  The users script files for this blog entry
 - `dynplot_styles`:  The users CSS files for this blog entry  
 
-Options are evaluated with increasing priority: defaults -> pelican.conf -> article/page. Currently no local installations of the two JavaScript libraries are supported. All JS and CSS will be copied to `output` folder. Here, a leading forward slash for filenames in `dynplot_sripts` means, that the root directory is the `output` directory. Otherwise the path is considered relative to the respective article or page. 
+Options are evaluated with increasing priority: defaults -> pelican.conf -> article/page. Currently no local installations of the two JavaScript libraries are supported. All JS and CSS will be copied to the output folder. Here, a leading forward slash for filenames in `dynplot_sripts` means, that the file name is considered relative the output folder itself. Otherwise the path is considered relative to the respective article or page. 
 
 
 Finally, in your base template (likely named `base.html`), you need to add the following in your `head` tags: 
