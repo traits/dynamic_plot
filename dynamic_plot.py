@@ -21,18 +21,6 @@ DP_KEY = "DYNAMIC_PLOT_OPTIONS"
 DP_SCRIPTS_KEY = "dynplot_scripts"
 DP_STYLES_KEY = "dynplot_styles"
 
-# hack: (see https://github.com/getpelican/pelican-plugins/issues/1260)
-# We need the following temporary keys to maintain the original metadata
-# before they are converted into html tags in format_tags in order
-# to be able to use them in add_files.
-# Somewhere between the calls of the signals for article_generator_context (format_tags)
-# and article_generator_write_article (add_files) the metadata with the original key
-# is written using the themes template, so the html tag conversion cannot be postponed to
-# the article_generator_write_article handler.
-
-DP_SCRIPTS_KEY_TMP = DP_SCRIPTS_KEY + "_"
-DP_STYLES_KEY_TMP = DP_STYLES_KEY + "_"
-
 file_mapping = []
 
 
@@ -80,16 +68,18 @@ def copy_resources(gen):
 
 
 def get_mapping(content, tag):
-    metadata = content.metadata
+    files_str = []
+
+    if hasattr(content, tag):
+        files_str = getattr(content, tag)
+
+    if not files_str:
+        return []
+
     src_dir = Path(content.relative_dir)
     dst_dir = Path(content.url).parent
     content_root = Path(content.settings.get("PATH"))
     output_root = Path(content.settings.get("OUTPUT_PATH"))
-
-    files_str = metadata.get(tag)
-
-    if not files_str:
-        return []
 
     file_list = files_str.replace(" ", "").split(",")
 
@@ -109,8 +99,11 @@ def get_mapping(content, tag):
     return result
 
 
-def get_formatted_resource(metadata, tag, formatter):
-    files_str = metadata.get(tag)
+def get_formatted_resource(content, tag, formatter):
+    files_str = []
+
+    if hasattr(content, tag):
+        files_str = getattr(content, tag)
 
     if not files_str:
         return []
@@ -120,26 +113,24 @@ def get_formatted_resource(metadata, tag, formatter):
     return [formatter.format(Path(f).as_posix()) for f in file_list]
 
 
-def format_tags(gen, metadata):
+def format_tags(content):
     scripts = get_formatted_resource(
-        metadata, DP_SCRIPTS_KEY, '<script type="module" src="{0}"></script>'
+        content, DP_SCRIPTS_KEY, '<script type="module" src="{0}"></script>'
     )
     styles = get_formatted_resource(
-        metadata, DP_STYLES_KEY, '<link rel="stylesheet" href="{0}" type="text/css" />',
+        content, DP_STYLES_KEY, '<link rel="stylesheet" href="{0}" type="text/css" />',
     )
     if scripts:
         #  user scripts
-        metadata[DP_SCRIPTS_KEY_TMP] = metadata[DP_SCRIPTS_KEY]
-        metadata[DP_SCRIPTS_KEY] = [x for x in scripts]
+        content.dynplot_scripts = [x for x in scripts]
         #  master scripts
         for url_tag in ["dynplot_d3_url", "dynplot_three_url"]:
-            url = get_effective_option(metadata, gen.settings, url_tag)
+            url = get_effective_option(content.metadata, content.settings, url_tag)
             url = f'<script src="{url}"></script>'
-            metadata[DP_SCRIPTS_KEY].insert(0, url)
+            content.dynplot_scripts.insert(0, url)
     if styles:
         # user styles
-        metadata[DP_STYLES_KEY_TMP] = metadata[DP_STYLES_KEY]
-        metadata[DP_STYLES_KEY] = [x for x in styles]
+        content.dynplot_styles = [x for x in styles]
 
 
 def add_files(content):
@@ -147,13 +138,15 @@ def add_files(content):
     Receive generator and content and extract relevant information
     """
 
-    scripts = get_mapping(content, DP_SCRIPTS_KEY_TMP)
-    styles = get_mapping(content, DP_STYLES_KEY_TMP)
+    scripts = get_mapping(content, DP_SCRIPTS_KEY)
+    styles = get_mapping(content, DP_STYLES_KEY)
     global file_mapping
     if scripts:
         file_mapping += scripts
     if styles:
         file_mapping += styles
+
+    format_tags(content)
 
 
 def register():
@@ -161,7 +154,5 @@ def register():
         Plugin registration
     """
     signals.initialized.connect(init_default_config)
-    signals.article_generator_context.connect(format_tags)
-    signals.page_generator_context.connect(format_tags)
     signals.content_object_init.connect(add_files)
     signals.finalized.connect(copy_resources)
