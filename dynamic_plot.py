@@ -79,12 +79,12 @@ def copy_resources(gen):
         shutil.copy2(m[0], m[1])
 
 
-def get_mapping(gen, content, tag):
+def get_mapping(content, tag):
     metadata = content.metadata
     src_dir = Path(content.relative_dir)
     dst_dir = Path(content.url).parent
-    content_root = Path(gen.path)
-    output_root = Path(gen.output_path)
+    content_root = Path(content.settings.get("PATH"))
+    output_root = Path(content.settings.get("OUTPUT_PATH"))
 
     files_str = metadata.get(tag)
 
@@ -142,13 +142,13 @@ def format_tags(gen, metadata):
         metadata[DP_STYLES_KEY] = [x for x in styles]
 
 
-def add_files(gen, content):
+def add_files(content):
     """
     Receive generator and content and extract relevant information
     """
 
-    scripts = get_mapping(gen, content, DP_SCRIPTS_KEY_TMP)
-    styles = get_mapping(gen, content, DP_STYLES_KEY_TMP)
+    scripts = get_mapping(content, DP_SCRIPTS_KEY_TMP)
+    styles = get_mapping(content, DP_STYLES_KEY_TMP)
     global file_mapping
     if scripts:
         file_mapping += scripts
@@ -163,6 +163,5 @@ def register():
     signals.initialized.connect(init_default_config)
     signals.article_generator_context.connect(format_tags)
     signals.page_generator_context.connect(format_tags)
-    signals.article_generator_write_article.connect(add_files)
-    signals.page_generator_write_page.connect(add_files)
+    signals.content_object_init.connect(add_files)
     signals.finalized.connect(copy_resources)
