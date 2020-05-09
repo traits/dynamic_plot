@@ -11,9 +11,10 @@ It also allows for for embedding article-specific D3.js versions.
 import os
 import shutil
 from pathlib import Path
+import json
 import logging
 
-# import wingdbstub
+import wingdbstub
 
 from pelican import signals
 
@@ -58,12 +59,28 @@ def get_effective_option(metadata, settings, key):
     return metadata.get(key, settings[DP_KEY].get(key))
 
 
+def is_json(fname):
+    """
+    Returns True for string, enclosed with '[' ']', False else    
+    """
+
+    if str(fname) and (str(fname)[0] == "[") and (str(fname)[-1] == "]"):
+        return True
+    return False
+
+
+def get_json(json_file):
+    with open(json_file) as file:
+        data = json.load(file)
+    return list(data)
+
+
 def is_relative(fname):
     """
     Returns True for leading '/', False else    
     """
 
-    if fname and (fname[0] != "/"):
+    if str(fname) and (str(fname)[0] != "/"):
         return True
     return False
 
@@ -103,21 +120,23 @@ def get_mapping(content, tag):
     output_root = Path(content.settings.get("OUTPUT_PATH"))
 
     file_list = files_str.replace(" ", "").split(",")
+    json_files = [e[1:-1] for e in file_list if is_json(e)]
+    file_list = [e for e in file_list if not is_json(e)]
+
+    for j in json_files:
+        if is_relative(j):
+            file_list += get_json(content_root / src_dir / j)
+        else:
+            file_list += get_json(content_root / j[1:])
 
     result = []
     for f in file_list:
-        src = None
-        dst = None
         if is_relative(f):
-            src = content_root / src_dir / f
-            dst = output_root / dst_dir / f
+            result.append([content_root / src_dir / f, output_root / dst_dir / f, f])
         else:
-            src = content_root / f[1:]
-            dst = output_root / f[1:]
+            result.append([content_root / f[1:], output_root / f[1:], f])
 
-        result.append([src.resolve(), dst.resolve()])
-
-    return result
+    return [[e[0].resolve(), e[1].resolve(), e[2]] for e in result]
 
 
 def get_formatted_resource(content, tag, formatter):
@@ -139,31 +158,35 @@ def get_formatted_resource(content, tag, formatter):
     return [formatter.format(Path(f).as_posix()) for f in file_list]
 
 
-def format_tags(content):
-    """
-    Provide html <script> and <link> tags for script/css files from metadata 
-    """
+def format_scripts(content, urls):
+    entries = [
+        f'<script type="module" src="{Path(f).as_posix()}"></script>' for f in urls
+    ]
 
-    scripts = get_formatted_resource(
-        content, DP_SCRIPTS_KEY, '<script type="module" src="{0}"></script>'
-    )
-    styles = get_formatted_resource(
-        content, DP_STYLES_KEY, '<link rel="stylesheet" href="{0}" type="text/css" />',
-    )
-    if scripts:
+    if entries:
         #  user scripts
         ## Take care here, NOT to try modifying content.metadata["dynplot_scripts"]
-        ## etc.. These will no longer affect the values used for html output after
+        ## These will no longer affect the values used for html output after
         ## content creation
-        content.dynplot_scripts = [x for x in scripts]
+        content.dynplot_scripts = [x for x in entries]
         #  master scripts
         for url_tag in ["dynplot_d3_url", "dynplot_three_url"]:
             url = get_effective_option(content.metadata, content.settings, url_tag)
             url = f'<script src="{url}"></script>'
             content.dynplot_scripts.insert(0, url)
-    if styles:
-        # user styles
-        content.dynplot_styles = [x for x in styles]
+
+
+def format_styles(content, urls):
+    entries = [
+        f'<link rel="stylesheet" href="{Path(f).as_posix()}" type="text/css" />'
+        for f in urls
+    ]
+    if entries:
+        #  user scripts
+        ## Take care here, NOT to try modifying content.metadata["dynplot_styles"]
+        ## These will no longer affect the values used for html output after
+        ## content creation
+        content.dynplot_styles = [x for x in entries]
 
 
 def add_files(content):
@@ -175,11 +198,11 @@ def add_files(content):
     styles = get_mapping(content, DP_STYLES_KEY)
     global file_mapping
     if scripts:
-        file_mapping += scripts
+        file_mapping += [[s[0], s[1]] for s in scripts]
+        format_scripts(content, [s[2] for s in scripts])
     if styles:
-        file_mapping += styles
-
-    format_tags(content)
+        file_mapping += [[s[0], s[1]] for s in styles]
+        format_styles(content, [s[2] for s in styles])
 
 
 def register():
