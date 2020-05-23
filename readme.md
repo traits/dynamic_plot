@@ -40,8 +40,14 @@ dynplot_styles: leibniz_d3.css, /global.css
 - `dynplot_styles`:  The users CSS files for this blog entry  
 
 Options are evaluated with increasing priority: `defaults -> pelican.conf -> article/page tags`. All JS and CSS will be copied to the output folder. Here, a leading forward slash for file names in `dynplot_sripts` and `dynplot_styles` means, that the name is considered relative to the root folder itself. Otherwise, he is relative to the respective article or page. 
-Names in brackets are considered as json file with a single array of file names. The file itself and also its content follow the same rule for relative and absolute paths as stated above.
+Names in brackets are considered as json file with a single array of file names. The file itself and also its content follow the same rule for relative and absolute paths as stated above. Example:
 
+```
+[
+    "2020-04-20/lib/three.js",
+    "2020-04-20/lib/OrbitControls.js",
+]
+```
 
 Finally, in your base template (likely named `base.html`), you need to add the following in your `head` tags: 
 ```
