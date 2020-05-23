@@ -16,8 +16,9 @@ To install the plugin, follow the instructions on the [Pelican plugin page.](htt
 PLUGINS = ['dynamic_plot']
 
 DYNAMIC_PLOT_OPTIONS = {
-    # 'dynplot_d3_url' : 'https://d3js.org/d3.v5.min.js' (default) 
-    # 'dynplot_three_url' : 'https://threejs.org/build/three.min.js' (default) 
+    # "dynplot_modules": True,
+    # "dynplot_d3_url' " "https://d3js.org/d3.v5.min.js" (default) 
+    # "dynplot_three_url" : "https://threejs.org/build/three.min.js" (default) 
 }
 ```
 
@@ -30,9 +31,11 @@ dynplot_d3_url: https://d3js.org/d3.v4.js
 dynplot_scripts: leibniz_d3.js, sphere_three.js, [files.json], ../up.js
 dynplot_styles: leibniz_d3.css, /global.css
 ```
-
+- `dynplot_modules`: (default: True) JS will be included as ES6 module
+`<script type="module" src="..."></script>`. The effective url's of the following two variables must reflect this. They can be empty though, if managing their content in `dynplot_scripts` itself.
+  
 - `dynplot_d3_url`: (default: `'https://d3js.org/d3.v5.min.js'`)  
-- `dynplot_three_url`: (default: `'https://threejs.org/build/three.min.js'`)  
+- `dynplot_three_url`: (default: `'https://threejs.org/build/three.module.js'`)  
 - `dynplot_scripts`:  The users script files for this blog entry
 - `dynplot_styles`:  The users CSS files for this blog entry  
 

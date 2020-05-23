@@ -14,17 +14,19 @@ from pathlib import Path
 import json
 import logging
 
-import wingdbstub
+# import wingdbstub
 
 from pelican import signals
 
 logger = logging.getLogger(__name__)
 
 DP_DEFAULT = {
+    "dynplot_modules": True,
     "dynplot_d3_url": "https://d3js.org/d3.v5.min.js",
-    "dynplot_three_url": "https://threejs.org/build/three.min.js",
+    "dynplot_three_url": "https://threejs.org/build/three.module.js",
 }
 DP_KEY = "DYNAMIC_PLOT_OPTIONS"
+DP_MODULES_KEY = "dynplot_modules"
 DP_SCRIPTS_KEY = "dynplot_scripts"
 DP_STYLES_KEY = "dynplot_styles"
 
@@ -159,9 +161,16 @@ def get_formatted_resource(content, tag, formatter):
 
 
 def format_scripts(content, urls):
-    entries = [
-        f'<script type="module" src="{Path(f).as_posix()}"></script>' for f in urls
-    ]
+    def script_string(is_module, src):
+        if is_module:
+            return f'<script type="module" src="{src}"></script>'
+        return f'<script src="{src}"></script>'
+
+    use_modules = get_effective_option(
+        content.metadata, content.settings, DP_SCRIPTS_KEY
+    )
+
+    entries = [script_string(use_modules, Path(f).as_posix()) for f in urls]
 
     if entries:
         #  user scripts
@@ -172,7 +181,7 @@ def format_scripts(content, urls):
         #  master scripts
         for url_tag in ["dynplot_d3_url", "dynplot_three_url"]:
             url = get_effective_option(content.metadata, content.settings, url_tag)
-            url = f'<script src="{url}"></script>'
+            url = script_string(use_modules, url)
             content.dynplot_scripts.insert(0, url)
 
 
